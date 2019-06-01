@@ -37,6 +37,7 @@ RUN tar -C /distroless/bazel-genfiles/experimental/busybox/ -xf /distroless/baze
 FROM debian:latest
 RUN apt-get update && \
     apt-get install -y git && \
+    apt-get install -y curl && \
     apt-get install -y libxml-xpath-perl && \
     apt-get clean
 COPY --from=0 /go/src/github.com/GoogleContainerTools/kaniko/out/executor /kaniko/executor
