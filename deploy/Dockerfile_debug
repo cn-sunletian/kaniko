@@ -34,7 +34,11 @@ WORKDIR /distroless
 RUN bazel build //experimental/busybox:busybox_tar
 RUN tar -C /distroless/bazel-genfiles/experimental/busybox/ -xf /distroless/bazel-genfiles/experimental/busybox/busybox.tar
 
-FROM scratch
+FROM debian:latest
+RUN apt-get update && \
+    apt-get install -y git && \
+    apt-get install -y libxml-xpath-perl && \
+    apt-get clean
 COPY --from=0 /go/src/github.com/GoogleContainerTools/kaniko/out/executor /kaniko/executor
 COPY --from=0 /usr/local/bin/docker-credential-gcr /kaniko/docker-credential-gcr
 COPY --from=0 /go/src/github.com/awslabs/amazon-ecr-credential-helper/bin/linux-amd64/docker-credential-ecr-login /kaniko/docker-credential-ecr-login
@@ -45,7 +49,7 @@ COPY files/ca-certificates.crt /kaniko/ssl/certs/
 COPY --from=0 /root/.docker/config.json /kaniko/.docker/config.json
 ENV HOME /root
 ENV USER /root
-ENV PATH /usr/local/bin:/kaniko:/busybox
+ENV PATH $PATH:/kaniko:/busybox
 ENV SSL_CERT_DIR=/kaniko/ssl/certs
 ENV DOCKER_CONFIG /kaniko/.docker/
 ENV DOCKER_CREDENTIAL_GCR_CONFIG /kaniko/.config/gcloud/docker_credential_gcr_config.json
